@@ -1,7 +1,5 @@
-const { Boom } = require('@hapi/boom');
-const { useMultiFileAuthState, makeInMemoryStore, delay, DefaultUserAgent } = require('@whiskeysockets/baileys');
+const { useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion, makeWASocket } = require('@whiskeysockets/baileys');
 const pino = require('pino');
-const { makeWASocket } = require('@whiskeysockets/baileys');
 
 // Initialize logger
 const logger = pino({ level: 'silent' });
@@ -11,31 +9,33 @@ async function startBot() {
     // Initialize auth state
     const { state, saveCreds } = await useMultiFileAuthState('auth_info');
     
-    // Create WhatsApp connection - UPDATED FOR BAILEYS v6+
+    // Fetch the latest version of Baileys
+    const { version } = await fetchLatestBaileysVersion();
+    
+    // Create WhatsApp connection
     const conn = makeWASocket({
         logger: logger,
-        printQRInTerminal: true,
+        version: version,
         auth: state,
+        printQRInTerminal: true, // Still works despite deprecation warning
         browser: ['Baileys Bot', 'Chrome', '1.0.0'],
         markOnlineOnConnect: true,
-        generateHighQualityLinkPreview: true,
-        userAgent: DefaultUserAgent
+        generateHighQualityLinkPreview: true
     });
-    
-    // Rest of your code remains the same...
-    const store = makeInMemoryStore({ logger: logger });
-    store.bind(conn.ev);
-    
-    // Load message handlers
-    const { handleCommands } = require('./handlers/commands');
-    const { handleMessages } = require('./handlers/messages');
     
     // Connection events
     conn.ev.on('connection.update', (update) => {
-        const { connection, lastDisconnect } = update;
+        const { connection, lastDisconnect, qr } = update;
+        
+        // Handle QR code (new way)
+        if (qr) {
+            console.log('Scan the QR code above to authenticate');
+        }
+        
         if (connection === 'close') {
-            // Reconnect if not logged out
-            if ((lastDisconnect.error)?.output?.statusCode !== 401) {
+            const shouldReconnect = (lastDisconnect.error)?.output?.statusCode !== DisconnectReason.loggedOut;
+            console.log('Connection closed due to:', lastDisconnect.error, ', reconnecting:', shouldReconnect);
+            if (shouldReconnect) {
                 startBot();
             }
         } else if (connection === 'open') {
@@ -45,6 +45,10 @@ async function startBot() {
     
     // Credentials update event
     conn.ev.on('creds.update', saveCreds);
+    
+    // Load message handlers
+    const { handleCommands } = require('./handlers/commands');
+    const { handleMessages } = require('./handlers/messages');
     
     // Message events
     conn.ev.on('messages.upsert', async ({ messages, type }) => {
@@ -58,14 +62,12 @@ async function startBot() {
                           message.message.extendedTextMessage?.text?.startsWith('!');
         
         if (isCommand) {
-            await handleCommands(conn, message, store);
+            await handleCommands(conn, message);
         } else {
-            await handleMessages(conn, message, store);
+            await handleMessages(conn, message);
         }
     });
-    
-    // No need to manually connect with makeWASocket
 }
 
 // Start the bot
-startBot().catch(err => console.log('Error xibs starting bot:', err));
+startBot().catch(err => console.log('Error starting bot:', err));
