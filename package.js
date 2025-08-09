@@ -1,5 +1,5 @@
 {
-  "name": "whatsapp-bot-baileys",
+  "name": "zs",
   "version": "1.0.0",
   "description": "A WhatsApp bot using Baileys library",
   "main": "index.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xibsx/ze.git"
+    "url": "git+https://github.com/xibsx/zs.git"
   },
   "keywords": [
     "whatsapp",
@@ -19,9 +19,9 @@
   "author": "Your Name",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/xibsx/ze/issues"
+    "url": "https://github.com/xibsx/zs/issues"
   },
-  "homepage": "https://github.com/xibsx/ze#readme",
+  "homepage": "https://github.com/xibsx/zs#readme",
   "dependencies": {
     "@whiskeysockets/baileys": "^6.4.0",
     "pino": "^8.14.1"
