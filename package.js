@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xibsx/za.git"
+    "url": "git+https://github.com/xibsx/ze.git"
   },
   "keywords": [
     "whatsapp",
@@ -19,9 +19,9 @@
   "author": "Your Name",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/xibsx/za/issues"
+    "url": "https://github.com/xibsx/ze/issues"
   },
-  "homepage": "https://github.com/xibsx/za#readme",
+  "homepage": "https://github.com/xibsx/ze#readme",
   "dependencies": {
     "@whiskeysockets/baileys": "^6.4.0",
     "pino": "^8.14.1"
