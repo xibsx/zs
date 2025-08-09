@@ -1,7 +1,7 @@
 const { Boom } = require('@hapi/boom');
-const { useMultiFileAuthState, makeInMemoryStore, delay } = require('@whiskeysockets/baileys');
+const { useMultiFileAuthState, makeInMemoryStore, delay, DefaultUserAgent } = require('@whiskeysockets/baileys');
 const pino = require('pino');
-const { WAConnection } = require('@whiskeysockets/baileys');
+const { makeWASocket } = require('@whiskeysockets/baileys');
 
 // Initialize logger
 const logger = pino({ level: 'silent' });
@@ -11,14 +11,18 @@ async function startBot() {
     // Initialize auth state
     const { state, saveCreds } = await useMultiFileAuthState('auth_info');
     
-    // Create WhatsApp connection
-    const conn = WAConnection({
+    // Create WhatsApp connection - UPDATED FOR BAILEYS v6+
+    const conn = makeWASocket({
         logger: logger,
         printQRInTerminal: true,
-        auth: state
+        auth: state,
+        browser: ['Baileys Bot', 'Chrome', '1.0.0'],
+        markOnlineOnConnect: true,
+        generateHighQualityLinkPreview: true,
+        userAgent: DefaultUserAgent
     });
     
-    // Store for keeping track of chats and messages
+    // Rest of your code remains the same...
     const store = makeInMemoryStore({ logger: logger });
     store.bind(conn.ev);
     
@@ -60,9 +64,8 @@ async function startBot() {
         }
     });
     
-    // Connect to WhatsApp
-    await conn.connect();
+    // No need to manually connect with makeWASocket
 }
 
 // Start the bot
-startBot().catch(err => console.log('Error starting bot:', err));
+startBot().catch(err => console.log('Error xibs starting bot:', err));
