@@ -176,7 +176,7 @@ Since Heroku has ephemeral storage (filesystem resets daily), you need to use cl
 git clone [https://github.com/yourusername/xibs-xv-bot.git](https://github.com/yourusername/xibs-xv-bot.git)
 cd xibs-xv-bot
 npm install
-npm start
+npm start```
 
  * Scan QR code to authenticate
  * Upload session folder to MEGA.nz:
